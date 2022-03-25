@@ -1,6 +1,6 @@
-# todo_list
+# Lista de Tarefa
 
-A new Flutter project.
+Aplicativo desenvolvido para melhorar a organização de tarefas diárias que devem ser realizadas.
 
 ## Getting Started
 
