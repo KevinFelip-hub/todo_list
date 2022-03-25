@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/models/todo.dart';
 import 'package:todo_list/repositories/todo_repository.dart';
-
-import '../widgets/todo_list_item.dart';
+import 'package:todo_list/widgets/todo_list_item.dart';
 
 class TodoListPage extends StatefulWidget {
-  TodoListPage({Key? key}) : super(key: key);
+  const TodoListPage({Key? key}) : super(key: key);
 
   @override
   State<TodoListPage> createState() => _TodoListPageState();
@@ -16,8 +15,22 @@ class _TodoListPageState extends State<TodoListPage> {
   final TodoRepository todoRepository = TodoRepository();
 
   List<Todo> todos = [];
+
   Todo? deletedTodo;
   int? deletedTodoPos;
+
+  String? errorText;
+
+  @override
+  void initState() {
+    super.initState();
+
+    todoRepository.getTodoList().then((value) {
+      setState(() {
+        todos = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,10 +47,11 @@ class _TodoListPageState extends State<TodoListPage> {
                     Expanded(
                       child: TextField(
                         controller: todoController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: "Adicione a Tarefa",
                           hintText: "Ex. Estuda para sair dai",
+                          errorText: errorText,
                         ),
                       ),
                     ),
@@ -45,6 +59,12 @@ class _TodoListPageState extends State<TodoListPage> {
                     ElevatedButton(
                       onPressed: () {
                         String text = todoController.text;
+                        if(text.isEmpty){
+                          setState(() {
+                            errorText = 'O titulo não pode ser vazio!';
+                          });
+                          return;
+                        }
                         setState(() {
                           Todo newTodo =
                               Todo(title: text, dateTime: DateTime.now());
@@ -114,7 +134,7 @@ class _TodoListPageState extends State<TodoListPage> {
       SnackBar(
         content: Text(
           "Tarefa ${todo.title} foi removida com sucesso!",
-          style: TextStyle(color: Color(0xff060708)),
+          style: const TextStyle(color: Color(0xff060708)),
         ),
         backgroundColor: Colors.white,
         action: SnackBarAction(
@@ -143,7 +163,7 @@ class _TodoListPageState extends State<TodoListPage> {
               Navigator.of(context).pop();
             },
             style: TextButton.styleFrom(
-              primary: Color(0xff00d7f3),
+              primary: const Color(0xff00d7f3),
             ),
             child: const Text("Cancelar"),
           ),
@@ -151,7 +171,7 @@ class _TodoListPageState extends State<TodoListPage> {
             onPressed: () {
               Navigator.of(context).pop();
               deleteAllTodos();
-              },
+            },
             style: TextButton.styleFrom(primary: Colors.red),
             child: const Text("Apagar"),
           ),
